@@ -49,7 +49,7 @@ import run_pylint
 import travis_helpers
 
 
-git_work_dir = os.environ.get('TRAVIS_BUILD_DIR', False)
+git_work_dir = os.environ.get('HOME', False)
 is_pull_request = os.environ.get(
     'TRAVIS_PULL_REQUEST', 'false') != 'false'
 version = os.environ.get('VERSION', '')

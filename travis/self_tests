@@ -80,7 +80,7 @@ class MainTest(unittest.TestCase):
     """PYLINT TEST CASES """
     def setUp(self):
         super(MainTest, self).setUp()
-        self.repo_dir = os.environ.get("TRAVIS_BUILD_DIR", ".")
+        self.repo_dir = os.environ.get("HOME", ".")
         self.repo_dir_with_subfolders = os.path.join(
             self.repo_dir, "tests", "test_repo_with_subfolders")
         self.exclude = os.environ.get("EXCLUDE")
@@ -88,7 +88,7 @@ class MainTest(unittest.TestCase):
         self.to_preinstall = get_test_dependencies(
             self.repo_dir, self.addons_list)
 
-        self.git_work_dir = os.environ.get('TRAVIS_BUILD_DIR', False)
+        self.git_work_dir = os.environ.get('HOME', False)
         self.pylint_rcfile = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             'cfg', "travis_run_pylint.cfg")

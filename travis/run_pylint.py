@@ -290,7 +290,7 @@ def run_pylint(paths, cfg, beta_msgs=None, sys_paths=None, extra_params=None):
 
 
 @click.command()
-@click.option('paths', '--path', envvar='TRAVIS_BUILD_DIR',
+@click.option('paths', '--path', envvar='HOME',
               multiple=True, type=CLICK_DIR, required=True,
               default=[os.getcwd()],
               help="Addons paths to check pylint")

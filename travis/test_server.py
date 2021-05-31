@@ -127,15 +127,15 @@ def get_server_path(odoo_full, odoo_version, travis_home):
     return server_path
 
 
-def get_addons_path(travis_dependencies_dir, travis_build_dir, server_path):
+def get_addons_path(travis_dependencies_dir, HOME, server_path):
     """
     Computes addons path
     :param travis_dependencies_dir: Travis dependencies directory
-    :param travis_build_dir: Travis build directory
+    :param HOME: Travis build directory
     :param server_path: Server path
     :return: Addons path
     """
-    addons_path_list = get_addons(travis_build_dir)
+    addons_path_list = get_addons(HOME)
     addons_path_list.extend(get_addons(travis_dependencies_dir))
     addons_path_list.append(os.path.join(server_path, "addons"))
     addons_path = ','.join(addons_path_list)
@@ -148,10 +148,10 @@ def get_server_script(server_path):
     return 'openerp-server'
 
 
-def get_addons_to_check(travis_build_dir, odoo_include, odoo_exclude):
+def get_addons_to_check(HOME, odoo_include, odoo_exclude):
     """
     Get the list of modules that need to be installed
-    :param travis_build_dir: Travis build directory
+    :param HOME: Travis build directory
     :param odoo_include: addons to include (travis parameter)
     :param odoo_exclude: addons to exclude (travis parameter)
     :return: List of addons to test
@@ -159,7 +159,7 @@ def get_addons_to_check(travis_build_dir, odoo_include, odoo_exclude):
     if odoo_include:
         addons_list = parse_list(odoo_include)
     else:
-        addons_list = get_modules(travis_build_dir)
+        addons_list = get_modules(HOME)
 
     if odoo_exclude:
         exclude_list = parse_list(odoo_exclude)
@@ -300,7 +300,7 @@ def main(argv=None):
     run_from_env_var('RUN_COMMAND_MQT', os.environ)
     travis_home = os.environ.get("HOME", "~/")
     travis_dependencies_dir = os.path.join(travis_home, 'dependencies')
-    travis_build_dir = os.environ.get("TRAVIS_BUILD_DIR", "../..")
+    HOME = os.environ.get("HOME", "../..")
     odoo_unittest = str2bool(os.environ.get("UNIT_TEST"))
     odoo_exclude = os.environ.get("EXCLUDE")
     odoo_include = os.environ.get("INCLUDE")
@@ -339,19 +339,19 @@ def main(argv=None):
                                   travis_home)
     script_name = get_server_script(server_path)
     addons_path = get_addons_path(travis_dependencies_dir,
-                                  travis_build_dir,
+                                  HOME,
                                   server_path)
     create_server_conf({
         # when installing with pip we don't need an addons_path
         'addons_path': addons_path if os.environ.get("MQT_DEP", "OCA") == "OCA" else "",
         'data_dir': data_dir,
     }, odoo_version)
-    tested_addons_list = get_addons_to_check(travis_build_dir,
+    tested_addons_list = get_addons_to_check(HOME,
                                              odoo_include,
                                              odoo_exclude)
     tested_addons = ','.join(tested_addons_list)
 
-    print("Working in %s" % travis_build_dir)
+    print("Working in %s" % HOME)
     print("Using repo %s and addons path %s" % (odoo_full, addons_path))
 
     if not tested_addons:
@@ -364,7 +364,7 @@ def main(argv=None):
                                                tested_addons_list)
 
     preinstall_modules = list(set(preinstall_modules) - set(get_modules(
-        os.environ.get('TRAVIS_BUILD_DIR')))) or ['base']
+        os.environ.get('HOME')))) or ['base']
     print("Modules to preinstall: %s" % preinstall_modules)
     setup_server(dbtemplate, odoo_unittest, tested_addons_list, server_path,
                  script_name, addons_path, install_options, preinstall_modules,
